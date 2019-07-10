@@ -4,18 +4,41 @@ Benchmarking for Web Feature Service
 
 ## Installation
 
-TBC
+See the file `INSTALL.md` 
 
 ## Running the benchmarker
 
-Run as follows:
+Run as follows...
+
+0. Make sure you have installed `python3.7` and `locust`, see: `INSTALL.md`.
+
+1. Activate the environment:
 
 ```
-SERVER=glamod1-original
+export PATH=$PWD/miniconda3/bin:$PATH
+source activate
+```
+
+2. Set up the base name of the output files:
+
+
+```
+SERVICE=glamod1
+TESTER=$(hostname -s)
 NOW=$(date +%Y%m%dT%H%M%S)
-OUTPUT=results/${SERVER}-${NOW}
+OUTPUT=results/${SERVICE}-${TESTER}-${NOW}
+```
+
+3. And run the benchmarker for 30 minutes and 10 concurrent requests:
+
+```
 locust --no-web -c 10 --run-time 30m --csv=$OUTPUT
 ```
+
+## Where do the output files live?
+
+The outputs get written to the terminal and also to 2 CSV files in
+the `results/` sub-directory.
 
 ## Basic usage
 

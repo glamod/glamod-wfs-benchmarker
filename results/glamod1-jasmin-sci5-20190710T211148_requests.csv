@@ -1,7 +1,7 @@
 "Method","Name","# requests","# failures","Median response time","Average response time","Min response time","Max response time","Average Content Size","Requests/s"
-"GET","capabilities",26,0,22,887,15,16941,87163,0.02
-"GET","station_ids",63,0,160,451,77,3395,142608,0.04
-"GET","station_time_series",54,0,121000,154039,55829,684822,42491027,0.04
-"GET","table_counts",41,0,67,493,42,16988,2103,0.03
-"GET","time_bbox",59,0,4900,16510,665,67271,151510472,0.04
-"None","Total",243,0,950,38535,15,684822,46275597,0.16
+"GET","capabilities",28,0,22,825,14,16941,87163,0.02
+"GET","station_ids",72,0,170,1184,77,19307,161341,0.04
+"GET","station_time_series",57,0,123000,189671,55829,866099,42011491,0.03
+"GET","table_counts",43,0,67,474,42,16988,2103,0.02
+"GET","time_bbox",65,0,5200,17423,665,67271,157931763,0.04
+"None","Total",265,0,960,45556,14,866099,47827801,0.15
