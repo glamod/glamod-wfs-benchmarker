@@ -3,16 +3,16 @@ import random
 
 from locust import HttpLocust, TaskSet, task
 
+from deterministic_tasks import query_generators
 
 logging.basicConfig()
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
+
+HOST = 'http://glamod1.ceda.ac.uk'
 
 
 class UserTasks(TaskSet):
-
-#    def wait_function(self):
-#        return 10 #waiter()
 
     def on_start(self):
         """ on_start is called when a Locust start before any task is scheduled """
@@ -20,13 +20,12 @@ class UserTasks(TaskSet):
 
     def on_stop(self):
         """ on_stop is called when the TaskSet is stopping """
-        pass #log.warn('STOP')
+        pass
+
 
     def _year(self):
         return random.randint(1861, 2010)
 
-    def _month(self):
-        return random.randint(1, 8)
 
     def _var_code(self, n=1):
         if n == 1: return 85
@@ -35,11 +34,9 @@ class UserTasks(TaskSet):
         sample.append(85)
         return '(' + ','.join([str(_) for _ in sample]) + ')'
 
-    def _bbox(self):
-        return '-50,-50,50,50'
 
     @task(1)
-    def capabilities(self):
+    def get_capabilities(self):
         query = '/geoserver/glamod/ows?service=WFS&version=2.0.0&request=GetCapabilities'
 
         with self.client.get(query, catch_response=True, name='capabilities') as response:
@@ -48,31 +45,46 @@ class UserTasks(TaskSet):
 
         self.client.get(query, name='capabilities')
 
-    @task(1)
-    def station_ids(self):
-        record_count = random.randint(500, 100000) 
-        query = '/geoserver/glamod/ows?service=WFS&version=2.0.0&request=GetFeature&typename=station_configuration&outputFormat=json&propertyName=primary_id&count={}'.format(record_count)
-        self.client.get(query, name='station_ids')
+    @task(3)
+    def query_station_ids(self):
+        name = 'station_ids'
+        query = query_generators[name].get_next()
+        record_count = int(query.split('=')[-1])
+        
+        with self.client.get(query, name=name, catch_response=True) as response:
+            n_lines = len(response.text.split('\n'))
+            assert(record_count == (n_lines - 2))
 
-    @task(1)
-    def query_bbox_time(self):
-        start_year = self._year()
-        end_year = start_year + random.randint(0, 5)
-        start_month = self._month()
-        end_month = start_month + 4
-        var_codes = self._var_code(2)
-        bbox = self._bbox()
+        log.debug('Query: {}{}'.format(HOST, query))
 
-        query = '/geoserver/glamod/ows?service=WFS&version=2.0.0&request=GetFeature&typename=observations_table&outputFormat=json&cql_filter=date_time%20DURING%20{}-{:02d}-01T00:00:00Z/{}-{:02d}-28T00:00:00Z%20AND%20report_type=2%20AND%20observed_variable%20IN%20{}%20AND%20BBOX(location,{})'.format(start_year, start_month, end_year, end_month, var_codes, bbox)
 
-        with self.client.get(query, name='query_bbox_time', catch_response=True) as response:
+    @task(3)
+    def query_time_bbox(self):
+        name = 'time_bbox'
+        query = query_generators[name].get_next()
+
+        with self.client.get(query, name=name, catch_response=True) as response:
             json = response.json()
             assert('totalFeatures' in json)
 
-        log.info('Query: {}'.format(query))
+        log.debug('Query: {}{}'.format(HOST, query))
+
+
+    @task(3)
+    def station_time_series(self):
+        name = 'station_time_series'
+        query = query_generators[name].get_next()
+
+        with self.client.get(query, name=name, catch_response=True) as response:
+            json = response.json()
+            assert('totalFeatures' in json)
+            assert(json['totalFeatures'] > 10)
+
+        log.debug('Query: {}{}'.format(HOST, query))
+
 
     @task(2)
-    def table_counts(self):
+    def query_table_counts(self):
         var_code = self._var_code()
         year = self._year()
         report_type = random.choice([0, 2, 3])
@@ -85,7 +97,8 @@ class WebsiteUser(HttpLocust):
     task_set = UserTasks
     min_wait = 100
     max_wait = 2000
-    host = 'http://glamod1.ceda.ac.uk'
+    host = HOST
+
 
 
 
