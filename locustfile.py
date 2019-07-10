@@ -2,6 +2,9 @@ import logging
 import random
 
 from locust import HttpLocust, TaskSet, task
+import locust.stats
+
+locust.stats.CSV_STATS_INTERVAL_SEC = 5 # default is 2 seconds
 
 from deterministic_tasks import query_generators
 

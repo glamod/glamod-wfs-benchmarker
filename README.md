@@ -2,6 +2,18 @@
 
 Benchmarking for Web Feature Service
 
+## Installation
+
+TBC
+
+## Running the benchmarker
+
+Run as follows:
+
+```
+locust --no-web -c 10 --run-time 30m --csv=results/wfs-$(date +%Y%m%dT%H%M%S)
+```
+
 ## Basic usage
 
 Command-line will find `locustfile.py` and use it to configure tests. Run with:
