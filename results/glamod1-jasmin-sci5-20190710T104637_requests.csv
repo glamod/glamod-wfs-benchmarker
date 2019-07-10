@@ -1,0 +1,7 @@
+"Method","Name","# requests","# failures","Median response time","Average response time","Min response time","Max response time","Average Content Size","Requests/s"
+"GET","capabilities",50,0,19,201,13,5324,87163,0.03
+"GET","station_ids",64,0,160,1215,72,18207,144577,0.04
+"GET","station_time_series",57,0,130000,188774,48634,944448,42011491,0.03
+"GET","table_counts",37,0,57,98,43,1175,2110,0.02
+"GET","time_bbox",53,0,7000,16631,705,59752,144313181,0.03
+"None","Total",261,0,450,44954,13,944448,38532347,0.15
